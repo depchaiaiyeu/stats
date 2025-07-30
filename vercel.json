@@ -1,13 +1,5 @@
 {
-  "functions": {
-    "api/stats.js": {
-      "maxDuration": 10
-    }
-  },
   "rewrites": [
-    {
-      "source": "/",
-      "destination": "/api/stats"
-    }
+    { "source": "/", "destination": "/api/stats" }
   ]
 }
