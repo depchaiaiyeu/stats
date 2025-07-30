@@ -1,8 +1,13 @@
 {
+  "functions": {
+    "api/stats.js": {
+      "maxDuration": 10
+    }
+  },
   "rewrites": [
     {
       "source": "/",
-      "destination": "/index.html"
+      "destination": "/api/stats"
     }
   ]
 }
