@@ -1,20 +1,23 @@
 // api/stats.js
-import { kv } from '@vercel/kv';
+import { Redis } from '@upstash/redis';
 
 export default async function handler(req, res) {
   try {
+    // Khởi tạo Redis client từ environment variables
+    const redis = Redis.fromEnv();
+    
     // Tăng counter tổng
-    const totalRequests = await kv.incr('total_requests');
+    const totalRequests = await redis.incr('total_requests');
     
     // Lưu timestamp của request hiện tại
     const now = Date.now();
     const currentSecond = Math.floor(now / 1000);
     
     // Tăng counter cho giây hiện tại
-    await kv.incr(`requests_${currentSecond}`);
+    await redis.incr(`requests_${currentSecond}`);
     
     // Set expiry cho key này sau 24 giờ để tránh tích tụ quá nhiều keys
-    await kv.expire(`requests_${currentSecond}`, 86400);
+    await redis.expire(`requests_${currentSecond}`, 86400);
     
     // Kiểm tra nếu request muốn JSON data
     const acceptHeader = req.headers.accept || '';
@@ -29,7 +32,7 @@ export default async function handler(req, res) {
         const time = (currentSecond - 299 + i) * 1000;
         const secondKey = Math.floor(time / 1000);
         promises.push(
-          kv.get(`requests_${secondKey}`).then(count => [time, count || 0])
+          redis.get(`requests_${secondKey}`).then(count => [time, count || 0])
         );
       }
       
